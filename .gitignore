@@ -1,0 +1,15 @@
+# ─── Segredos — NUNCA suba este arquivo para o GitHub ───
+.env
+
+# ─── Caches e dados locais ───
+__pycache__/
+*.py[cod]
+*.log
+
+# ─── VS Code / IDE ───
+.vscode/
+.idea/
+
+# ─── Sistema operacional ───
+.DS_Store
+Thumbs.db
