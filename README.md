@@ -21,11 +21,13 @@ Stack local para rodar modelos de linguagem com GPU NVIDIA usando **vLLM** como 
 
 | Serviço | Modelo | Porta | VRAM estimada | Contexto |
 |---|---|---|---|---|
-| `vllm-gemma` | google/gemma-2-2b-it | 8000 | ~5.5 GB | 6144 tokens |
+| `vllm-gemma` | google/gemma-2-2b-it | 8000 | ~5.5 GB | 8192 tokens |
 | `vllm-llama` | meta-llama/Llama-3.2-3B-Instruct | 8001 | ~6.5 GB | 4096 tokens |
 | `vllm-qwen` | Qwen/Qwen2.5-3B-Instruct | 8002 | ~6.5 GB | 8192 tokens |
 
-> ⚠️ Com **8 GB de VRAM**, rode **apenas um modelo de cada vez**.
+> ⚠️ **Limitações de Hardware (8 GB VRAM):**
+> 1. Rode **apenas um modelo de cada vez** para evitar travamentos e lentidão.
+> 2. O parâmetro `--enforce-eager` está habilitado por padrão para evitar o consumo excessivo de VRAM durante a compilação do PyTorch/Inductor na inicialização.
 
 ---
 
@@ -99,15 +101,15 @@ docker compose up -d vllm-qwen open-webui
 
 ### Alternar entre modelos
 
-```bash
-# Parar modelo atual
-docker compose stop vllm-gemma
+Para alternar o modelo ativo de forma limpa e evitar conflitos de memória GPU:
 
-# Subir outro (libera a VRAM automaticamente)
-docker compose up -d vllm-llama
-```
-
-> O Open WebUI detecta automaticamente quais modelos estão ativos — sem precisar reiniciar a interface.
+1. Abra o arquivo `docker-compose.yml`.
+2. Comente as linhas do modelo atual (inserindo `#` no início de cada linha) e descomente as linhas do modelo que deseja ativar.
+3. No serviço `open-webui`, atualize a variável `OPENAI_API_BASE_URLS` com o endpoint do modelo que você acabou de ativar (ex: `http://vllm-qwen2-3b:8002/v1`).
+4. Execute o comando abaixo para aplicar as alterações, recriar os containers necessários e remover o antigo da VRAM:
+   ```bash
+   docker compose up -d --remove-orphans
+   ```
 
 ### Acessar a interface
 
